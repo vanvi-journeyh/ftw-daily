@@ -7,6 +7,7 @@ require('./env').configureEnv();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const sharetribeSdk = require('sharetribe-flex-sdk');
 const apiRouter = require('./apiRouter');
 
 const radix = 10;
@@ -22,7 +23,11 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(express.json());
+app.use(
+  express.json({
+    reviver: sharetribeSdk.types.reviver,
+  })
+);
 app.use('/api', apiRouter);
 
 app.listen(PORT, () => {

@@ -1,5 +1,5 @@
 const { transactionLineItems } = require('../api-util/lineItems');
-const { getSdk, getTrustedSdk, handleError } = require('../api-util/sdk');
+const { getSdk, getTrustedSdk, handleError, serialize, deserialize } = require('../api-util/sdk');
 
 const debug = (...args) => {
   const formattedArgs = args.map(arg => {
@@ -12,6 +12,8 @@ const debug = (...args) => {
 };
 
 module.exports = (req, res) => {
+  // const { isSpeculative, bookingData, bodyParams, queryParams } = deserialize(req.body);
+  console.log('body:', req.body);
   const { isSpeculative, bookingData, bodyParams, queryParams } = req.body;
 
   const listingId = bodyParams && bodyParams.params ? bodyParams.params.listingId : null;
@@ -58,11 +60,13 @@ module.exports = (req, res) => {
       const { status, statusText, data } = apiResponse;
       res
         .status(status)
-        .json({
-          status,
-          statusText,
-          data,
-        })
+        .send(
+          serialize({
+            status,
+            statusText,
+            data,
+          })
+        )
         .end();
     })
     .catch(e => {

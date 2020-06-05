@@ -48,6 +48,20 @@ const getUserToken = req => {
   return cookieTokenStore.getToken();
 };
 
+exports.serialize = data => {
+  console.log('serialize input:', data);
+  const str = JSON.stringify(data);
+  console.log('serialize output:', str);
+  return str;
+};
+
+exports.deserialize = str => {
+  console.log('deserialize input:', str);
+  const data = JSON.parse(str, sharetribeSdk.types.reviver);
+  console.log('deserialize output:', data);
+  return data;
+};
+
 exports.handleError = (res, error) => {
   console.error(error);
   if (error.status && error.statusText && error.data) {
