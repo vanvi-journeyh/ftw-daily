@@ -10,10 +10,14 @@ const express = require('express');
 
 const initiateLoginAs = require('./api/initiate-login-as');
 const loginAs = require('./api/login-as');
+const transactionLineItems = require('./api/transaction-line-items');
+const initiatePrivileged = require('./api/initiate-privileged');
 
 const router = express.Router();
 
 router.get('/initiate-login-as', initiateLoginAs);
 router.get('/login-as', loginAs);
+router.post('/transaction-line-items', transactionLineItems);
+router.post('/initiate-privileged', initiatePrivileged);
 
 module.exports = router;
