@@ -11,6 +11,7 @@ import {
   TRANSITION_CANCEL,
   TRANSITION_COMPLETE,
   TRANSITION_PROVIDER_DECLINE,
+  TRANSITION_CUSTOMER_DECLINE,
   TRANSITION_EXPIRE,
   TRANSITION_CONFIRM_PAYMENT,
   TRANSITION_REVIEW_1_BY_CUSTOMER,
@@ -132,6 +133,7 @@ const resolveTransitionMessage = (
         <FormattedMessage id="ActivityFeed.transitionAccept" values={{ displayName }} />
       );
     case TRANSITION_PROVIDER_DECLINE:
+    case TRANSITION_CUSTOMER_DECLINE:
       return isOwnTransition ? (
         <FormattedMessage id="ActivityFeed.ownTransitionDecline" />
       ) : (

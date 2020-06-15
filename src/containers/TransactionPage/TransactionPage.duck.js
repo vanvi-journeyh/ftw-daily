@@ -12,6 +12,7 @@ import {
   txIsInFirstReviewBy,
   TRANSITION_ACCEPT,
   TRANSITION_PROVIDER_DECLINE,
+  TRANSITION_CUSTOMER_DECLINE,
 } from '../../util/transaction';
 import * as log from '../../util/log';
 import {
@@ -346,14 +347,16 @@ export const acceptSale = id => (dispatch, getState, sdk) => {
     });
 };
 
-export const declineSale = id => (dispatch, getState, sdk) => {
+export const declineSale = (id, isCustomer) => (dispatch, getState, sdk) => {
   if (acceptOrDeclineInProgress(getState())) {
     return Promise.reject(new Error('Accept or decline already in progress'));
   }
   dispatch(declineSaleRequest());
 
+  const transition = isCustomer ? TRANSITION_CUSTOMER_DECLINE : TRANSITION_PROVIDER_DECLINE;
+
   return sdk.transactions
-    .transition({ id, transition: TRANSITION_PROVIDER_DECLINE, params: {} }, { expand: true })
+    .transition({ id, transition, params: {} }, { expand: true })
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       dispatch(declineSaleSuccess());
@@ -364,7 +367,7 @@ export const declineSale = id => (dispatch, getState, sdk) => {
       dispatch(declineSaleError(storableError(e)));
       log.error(e, 'reject-sale-failed', {
         txId: id,
-        transition: TRANSITION_PROVIDER_DECLINE,
+        transition,
       });
       throw e;
     });

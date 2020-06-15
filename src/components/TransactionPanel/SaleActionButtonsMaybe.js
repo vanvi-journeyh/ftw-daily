@@ -18,6 +18,7 @@ const SaleActionButtonsMaybe = props => {
     declineSaleError,
     onAcceptSale,
     onDeclineSale,
+    shouldShowAcceptButton,
   } = props;
 
   const buttonsDisabled = acceptInProgress || declineInProgress;
@@ -49,13 +50,15 @@ const SaleActionButtonsMaybe = props => {
         >
           <FormattedMessage id="TransactionPanel.declineButton" />
         </SecondaryButton>
-        <PrimaryButton
-          inProgress={acceptInProgress}
-          disabled={buttonsDisabled}
-          onClick={onAcceptSale}
-        >
-          <FormattedMessage id="TransactionPanel.acceptButton" />
-        </PrimaryButton>
+        {shouldShowAcceptButton && (
+          <PrimaryButton
+            inProgress={acceptInProgress}
+            disabled={buttonsDisabled}
+            onClick={onAcceptSale}
+          >
+            <FormattedMessage id="TransactionPanel.acceptButton" />
+          </PrimaryButton>
+        )}
       </div>
     </div>
   ) : null;

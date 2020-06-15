@@ -236,7 +236,7 @@ export class TransactionPanelComponent extends Component {
         return {
           headingState: HEADING_REQUESTED,
           showDetailCardHeadings: isCustomer,
-          showSaleButtons: isProvider && !isCustomerBanned,
+          showSaleButtons: (isProvider && !isCustomerBanned) || (isCustomer && !isCustomerBanned),
         };
       } else if (txIsAccepted(tx)) {
         return {
@@ -309,7 +309,8 @@ export class TransactionPanelComponent extends Component {
         acceptSaleError={acceptSaleError}
         declineSaleError={declineSaleError}
         onAcceptSale={() => onAcceptSale(currentTransaction.id)}
-        onDeclineSale={() => onDeclineSale(currentTransaction.id)}
+        onDeclineSale={() => onDeclineSale(currentTransaction.id, isCustomer)}
+        shouldShowAcceptButton={isProvider}
       />
     );
 

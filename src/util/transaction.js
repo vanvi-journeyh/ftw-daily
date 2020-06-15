@@ -269,7 +269,7 @@ export const txIsRequested = tx =>
 export const txIsAccepted = tx =>
   getTransitionsToState(STATE_ACCEPTED).includes(txLastTransition(tx));
 
-export const txIsWaitingNoRefund = tx =>
+export const txIsCancelBookingNoRefund = tx =>
   getTransitionsToState(STATE_CANCEL_BOOKING_NO_REFUND).includes(txLastTransition(tx));
 
 export const txIsDeclined = tx =>
@@ -338,6 +338,7 @@ export const isRelevantPastTransition = transition => {
     TRANSITION_COMPLETE,
     TRANSITION_CONFIRM_PAYMENT,
     TRANSITION_PROVIDER_DECLINE,
+    TRANSITION_CUSTOMER_DECLINE,
     TRANSITION_EXPIRE,
     TRANSITION_REVIEW_1_BY_CUSTOMER,
     TRANSITION_REVIEW_1_BY_PROVIDER,
