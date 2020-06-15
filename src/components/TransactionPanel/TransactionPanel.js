@@ -12,6 +12,7 @@ import {
   txIsPaymentPending,
   txIsRequested,
   txHasBeenDelivered,
+  txIsCancelBookingNoRefund,
 } from '../../util/transaction';
 import { LINE_ITEM_NIGHT, LINE_ITEM_DAY, propTypes } from '../../util/types';
 import {
@@ -28,6 +29,7 @@ import {
   NamedLink,
   ReviewModal,
   UserDisplayName,
+  AskModal,
 } from '../../components';
 import { SendMessageForm } from '../../forms';
 import config from '../../config';
@@ -39,6 +41,7 @@ import DetailCardHeadingsMaybe from './DetailCardHeadingsMaybe';
 import DetailCardImage from './DetailCardImage';
 import FeedSection from './FeedSection';
 import SaleActionButtonsMaybe from './SaleActionButtonsMaybe';
+import CancelButtonsMaybe from './CancelButtonsMaybe';
 import PanelHeading, {
   HEADING_ENQUIRED,
   HEADING_PAYMENT_PENDING,
@@ -86,6 +89,7 @@ export class TransactionPanelComponent extends Component {
     this.state = {
       sendMessageFormFocused: false,
       isReviewModalOpen: false,
+      isAskModalOpen: false,
       reviewSubmitted: false,
     };
     this.isMobSaf = false;
@@ -191,6 +195,9 @@ export class TransactionPanelComponent extends Component {
       timeSlots,
       fetchTimeSlotsError,
       nextTransitions,
+      cancelInProgress,
+      cancelError,
+      onCancel,
     } = this.props;
 
     const currentTransaction = ensureTransaction(transaction);
@@ -236,13 +243,14 @@ export class TransactionPanelComponent extends Component {
         return {
           headingState: HEADING_REQUESTED,
           showDetailCardHeadings: isCustomer,
-          showSaleButtons: (isProvider && !isCustomerBanned) || (isCustomer && !isCustomerBanned),
+          showSaleButtons: (isProvider || isCustomer) && !isCustomerBanned,
         };
-      } else if (txIsAccepted(tx)) {
+      } else if (txIsAccepted(tx) || txIsCancelBookingNoRefund(tx)) {
         return {
           headingState: HEADING_ACCEPTED,
           showDetailCardHeadings: isCustomer,
           showAddress: isCustomer,
+          showCancelButton: (isProvider || isCustomer) && !isCustomerBanned,
         };
       } else if (txIsDeclined(tx)) {
         return {
@@ -311,6 +319,22 @@ export class TransactionPanelComponent extends Component {
         onAcceptSale={() => onAcceptSale(currentTransaction.id)}
         onDeclineSale={() => onDeclineSale(currentTransaction.id, isCustomer)}
         shouldShowAcceptButton={isProvider}
+      />
+    );
+
+    const cancelButton = (
+      <CancelButtonsMaybe
+        showButton={stateData.showCancelButton}
+        cancelInProgress={cancelInProgress}
+        cancelError={cancelError}
+        onCancel={() => {
+          const isCancelBookingNoRefund = txIsCancelBookingNoRefund(currentTransaction);
+          if (isCancelBookingNoRefund && isCustomer) {
+            this.setState({ isAskModalOpen: true });
+          } else {
+            onCancel(currentTransaction.id, isCustomer, isCancelBookingNoRefund);
+          }
+        }}
       />
     );
 
@@ -412,6 +436,10 @@ export class TransactionPanelComponent extends Component {
             {stateData.showSaleButtons ? (
               <div className={css.mobileActionButtons}>{saleButtons}</div>
             ) : null}
+
+            {stateData.showCancelButton && (
+              <div className={css.mobileActionButtons}>{cancelButton}</div>
+            )}
           </div>
 
           <div className={css.asideDesktop}>
@@ -456,6 +484,10 @@ export class TransactionPanelComponent extends Component {
               {stateData.showSaleButtons ? (
                 <div className={css.desktopActionButtons}>{saleButtons}</div>
               ) : null}
+
+              {stateData.showCancelButton && (
+                <div className={css.desktopActionButtons}>{cancelButton}</div>
+              )}
             </div>
           </div>
         </div>
@@ -470,6 +502,18 @@ export class TransactionPanelComponent extends Component {
           sendReviewInProgress={sendReviewInProgress}
           sendReviewError={sendReviewError}
         />
+        <AskModal
+          id="AskModal"
+          isOpen={this.state.isAskModalOpen}
+          onCloseModal={() => {
+            this.setState({ isAskModalOpen: false });
+          }}
+          onManageDisableScrolling={onManageDisableScrolling}
+          onOkay={() => {
+            this.setState({ isAskModalOpen: false });
+            onCancel(currentTransaction.id, isCustomer, true);
+          }}
+        />
       </div>
     );
   }
@@ -481,6 +525,7 @@ TransactionPanelComponent.defaultProps = {
   currentUser: null,
   acceptSaleError: null,
   declineSaleError: null,
+  cancelError: null,
   fetchMessagesError: null,
   initialMessageFailed: false,
   savePaymentMethodFailed: false,
@@ -524,6 +569,9 @@ TransactionPanelComponent.propTypes = {
   declineInProgress: bool.isRequired,
   acceptSaleError: propTypes.error,
   declineSaleError: propTypes.error,
+  cancelInProgress: bool.isRequired,
+  cancelError: propTypes.error,
+  onCancel: func.isRequired,
 
   // from injectIntl
   intl: intlShape,

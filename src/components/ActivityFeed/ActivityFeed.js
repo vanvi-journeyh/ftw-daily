@@ -8,7 +8,10 @@ import { formatDate } from '../../util/dates';
 import { ensureTransaction, ensureUser, ensureListing } from '../../util/data';
 import {
   TRANSITION_ACCEPT,
-  TRANSITION_CANCEL,
+  TRANSITION_PROVIDER_CANCEL,
+  TRANSITION_CUSTOMER_CANCEL_REFUND,
+  TRANSITION_PROVIDER_CANCEL_AFTER_48_HOUR,
+  TRANSITION_CUSTOMER_CANCEL_NO_REFUND,
   TRANSITION_COMPLETE,
   TRANSITION_PROVIDER_DECLINE,
   TRANSITION_CUSTOMER_DECLINE,
@@ -145,8 +148,15 @@ const resolveTransitionMessage = (
       ) : (
         <FormattedMessage id="ActivityFeed.transitionExpire" values={{ displayName }} />
       );
-    case TRANSITION_CANCEL:
-      return <FormattedMessage id="ActivityFeed.transitionCancel" />;
+    case TRANSITION_PROVIDER_CANCEL:
+    case TRANSITION_CUSTOMER_CANCEL_REFUND:
+    case TRANSITION_PROVIDER_CANCEL_AFTER_48_HOUR:
+    case TRANSITION_CUSTOMER_CANCEL_NO_REFUND:
+      return isOwnTransition ? (
+        <FormattedMessage id="ActivityFeed.ownTransitionCancel" />
+      ) : (
+        <FormattedMessage id="ActivityFeed.transitionCancel" values={{ displayName }} />
+      );
     case TRANSITION_COMPLETE:
       // Show the leave a review link if the state is delivered and if the current user is the first to leave a review
       const reviewPeriodJustStarted = txIsDelivered(transaction);

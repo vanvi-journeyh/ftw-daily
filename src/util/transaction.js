@@ -22,7 +22,8 @@ export const TRANSITION_REQUEST_FIRST_TIME = 'transition/request-first-time';
 export const TRANSITION_ENQUIRE = 'transition/enquire';
 // export const TRANSITION_REQUEST_AFTER_ENQUIRY = 'transition/request-payment-after-enquiry';
 export const TRANSITION_REQUEST_AFTER_ENQUIRY = 'transition/request-after-enquiry';
-export const TRANSITION_REQUEST_AFTER_ENQUIRY_FIRST_TIME = 'transition/request-after-enquiry-first-time';
+export const TRANSITION_REQUEST_AFTER_ENQUIRY_FIRST_TIME =
+  'transition/request-after-enquiry-first-time';
 
 // Stripe SDK might need to ask 3D security from customer, in a separate front-end step.
 // Therefore we need to make another transition to Marketplace API,
@@ -44,7 +45,7 @@ export const TRANSITION_PROVIDER_DECLINE = 'transition/provider-decline';
 export const TRANSITION_EXPIRE = 'transition/expire';
 
 // Admin can also cancel the transition.
-export const TRANSITION_CANCEL = 'transition/cancel';
+// export const TRANSITION_CANCEL = 'transition/cancel';
 export const TRANSITION_PROVIDER_CANCEL = 'transition/provider-cancel';
 export const TRANSITION_CUSTOMER_CANCEL_REFUND = 'transition/customer-cancel-refund';
 
@@ -179,7 +180,7 @@ const stateDescription = {
         [TRANSITION_PROVIDER_CANCEL_AFTER_48_HOUR]: STATE_CANCELLED,
         [TRANSITION_CUSTOMER_CANCEL_NO_REFUND]: STATE_CANCELLED,
         [TRANSITION_COMPLETE]: STATE_DELIVERED,
-      }
+      },
     },
 
     // [STATE_CANCELED]: {},
@@ -334,7 +335,11 @@ export const getReview2Transition = isCustomer =>
 export const isRelevantPastTransition = transition => {
   return [
     TRANSITION_ACCEPT,
-    TRANSITION_CANCEL,
+    // TRANSITION_CANCEL,
+    TRANSITION_PROVIDER_CANCEL,
+    TRANSITION_CUSTOMER_CANCEL_REFUND,
+    TRANSITION_PROVIDER_CANCEL_AFTER_48_HOUR,
+    TRANSITION_CUSTOMER_CANCEL_NO_REFUND,
     TRANSITION_COMPLETE,
     TRANSITION_CONFIRM_PAYMENT,
     TRANSITION_PROVIDER_DECLINE,

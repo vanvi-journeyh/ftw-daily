@@ -13,6 +13,10 @@ import {
   TRANSITION_ACCEPT,
   TRANSITION_PROVIDER_DECLINE,
   TRANSITION_CUSTOMER_DECLINE,
+  TRANSITION_PROVIDER_CANCEL,
+  TRANSITION_CUSTOMER_CANCEL_REFUND,
+  TRANSITION_PROVIDER_CANCEL_AFTER_48_HOUR,
+  TRANSITION_CUSTOMER_CANCEL_NO_REFUND,
 } from '../../util/transaction';
 import * as log from '../../util/log';
 import {
@@ -48,6 +52,10 @@ export const DECLINE_SALE_REQUEST = 'app/TransactionPage/DECLINE_SALE_REQUEST';
 export const DECLINE_SALE_SUCCESS = 'app/TransactionPage/DECLINE_SALE_SUCCESS';
 export const DECLINE_SALE_ERROR = 'app/TransactionPage/DECLINE_SALE_ERROR';
 
+export const CANCEL_SALE_REQUEST = 'app/TransactionPage/CANCEL_SALE_REQUEST';
+export const CANCEL_SALE_SUCCESS = 'app/TransactionPage/CANCEL_SALE_SUCCESS';
+export const CANCEL_SALE_ERROR = 'app/TransactionPage/CANCEL_SALE_ERROR';
+
 export const FETCH_MESSAGES_REQUEST = 'app/TransactionPage/FETCH_MESSAGES_REQUEST';
 export const FETCH_MESSAGES_SUCCESS = 'app/TransactionPage/FETCH_MESSAGES_SUCCESS';
 export const FETCH_MESSAGES_ERROR = 'app/TransactionPage/FETCH_MESSAGES_ERROR';
@@ -74,6 +82,8 @@ const initialState = {
   acceptSaleError: null,
   declineInProgress: false,
   declineSaleError: null,
+  cancelInProgress: false,
+  cancelError: null,
   fetchMessagesInProgress: false,
   fetchMessagesError: null,
   totalMessages: 0,
@@ -139,6 +149,13 @@ export default function checkoutPageReducer(state = initialState, action = {}) {
       return { ...state, declineInProgress: false };
     case DECLINE_SALE_ERROR:
       return { ...state, declineInProgress: false, declineSaleError: payload };
+
+    case CANCEL_SALE_REQUEST:
+      return { ...state, cancelInProgress: true, cancelError: null };
+    case CANCEL_SALE_SUCCESS:
+      return { ...state, cancelInProgress: false };
+    case CANCEL_SALE_ERROR:
+      return { ...state, cancelInProgress: false, cancelError: payload };
 
     case FETCH_MESSAGES_REQUEST:
       return { ...state, fetchMessagesInProgress: true, fetchMessagesError: null };
@@ -223,6 +240,10 @@ const acceptSaleError = e => ({ type: ACCEPT_SALE_ERROR, error: true, payload: e
 const declineSaleRequest = () => ({ type: DECLINE_SALE_REQUEST });
 const declineSaleSuccess = () => ({ type: DECLINE_SALE_SUCCESS });
 const declineSaleError = e => ({ type: DECLINE_SALE_ERROR, error: true, payload: e });
+
+const cancelSaleRequest = () => ({ type: CANCEL_SALE_REQUEST });
+const cancelSaleSuccess = () => ({ type: CANCEL_SALE_SUCCESS });
+const cancelSaleError = e => ({ type: CANCEL_SALE_ERROR, error: true, payload: e });
 
 const fetchMessagesRequest = () => ({ type: FETCH_MESSAGES_REQUEST });
 const fetchMessagesSuccess = (messages, pagination) => ({
@@ -365,6 +386,39 @@ export const declineSale = (id, isCustomer) => (dispatch, getState, sdk) => {
     })
     .catch(e => {
       dispatch(declineSaleError(storableError(e)));
+      log.error(e, 'reject-sale-failed', {
+        txId: id,
+        transition,
+      });
+      throw e;
+    });
+};
+
+export const cancelSale = (id, isCustomer, isNoRefund) => (dispatch, getState, sdk) => {
+  const state = getState();
+  if (state && state.TransactionPage.cancelInProgress) {
+    return Promise.reject(new Error('Cancel already in progress'));
+  }
+  dispatch(cancelSaleRequest());
+
+  let transition = isCustomer ? TRANSITION_CUSTOMER_CANCEL_REFUND : TRANSITION_PROVIDER_CANCEL;
+
+  if (isNoRefund) {
+    transition = isCustomer
+      ? TRANSITION_CUSTOMER_CANCEL_NO_REFUND
+      : TRANSITION_PROVIDER_CANCEL_AFTER_48_HOUR;
+  }
+
+  return sdk.transactions
+    .transition({ id, transition, params: {} }, { expand: true })
+    .then(response => {
+      dispatch(addMarketplaceEntities(response));
+      dispatch(cancelSaleSuccess());
+      dispatch(fetchCurrentUserNotifications());
+      return response;
+    })
+    .catch(e => {
+      dispatch(cancelSaleError(storableError(e)));
       log.error(e, 'reject-sale-failed', {
         txId: id,
         transition,

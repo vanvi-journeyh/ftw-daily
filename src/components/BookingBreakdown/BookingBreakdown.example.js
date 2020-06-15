@@ -2,7 +2,11 @@ import Decimal from 'decimal.js';
 import { types as sdkTypes } from '../../util/sdkLoader';
 import {
   TRANSITION_ACCEPT,
-  TRANSITION_CANCEL,
+  // TRANSITION_CANCEL,
+  TRANSITION_PROVIDER_CANCEL,
+  TRANSITION_CUSTOMER_CANCEL_REFUND,
+  TRANSITION_PROVIDER_CANCEL_AFTER_48_HOUR,
+  TRANSITION_CUSTOMER_CANCEL_NO_REFUND,
   TRANSITION_COMPLETE,
   TRANSITION_PROVIDER_DECLINE,
   TRANSITION_EXPIRE,
@@ -399,7 +403,7 @@ export const ProviderSaleCanceled = {
     unitType: LINE_ITEM_NIGHT,
     dateType: DATE_TYPE_DATETIME,
     transaction: exampleTransaction({
-      lastTransition: TRANSITION_CANCEL,
+      lastTransition: TRANSITION_PROVIDER_CANCEL,
       payinTotal: new Money(0, CURRENCY),
       payoutTotal: new Money(0, CURRENCY),
       lineItems: [
