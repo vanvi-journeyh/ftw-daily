@@ -58,6 +58,9 @@ export class SearchPageComponent extends Component {
       priceFilterConfig,
       dateRangeFilterConfig,
       keywordFilterConfig,
+      level,
+      subject,
+      teachingHour,
     } = this.props;
 
     // Note: "category" and "amenities" filters are not actually filtering anything by default.
@@ -85,6 +88,18 @@ export class SearchPageComponent extends Component {
       keywordFilter: {
         paramName: 'keywords',
         config: keywordFilterConfig,
+      },
+      levelFilter: {
+        paramName: 'pub_level',
+        options: level,
+      },
+      subjectFilter: {
+        paramName: 'pub_subject',
+        options: subject,
+      },
+      teachingHourFilter: {
+        paramName: 'pub_teachingHour',
+        options: teachingHour,
       },
     };
   }
@@ -234,6 +249,9 @@ export class SearchPageComponent extends Component {
             secondaryFilters={{
               categoryFilter: filters.categoryFilter,
               amenitiesFilter: filters.amenitiesFilter,
+              subjectFilter: filters.subjectFilter,
+              levelFilter: filters.levelFilter,
+              teachingHourFilter: filters.teachingHourFilter,
             }}
           />
           <ModalInMobile
@@ -279,6 +297,9 @@ SearchPageComponent.defaultProps = {
   tab: 'listings',
   categories: config.custom.categories,
   amenities: config.custom.amenities,
+  level: config.custom.level,
+  subject: config.custom.subject,
+  teachingHour: config.custom.teachingHour,
   priceFilterConfig: config.custom.priceFilterConfig,
   dateRangeFilterConfig: config.custom.dateRangeFilterConfig,
   keywordFilterConfig: config.custom.keywordFilterConfig,
@@ -299,6 +320,9 @@ SearchPageComponent.propTypes = {
   tab: oneOf(['filters', 'listings', 'map']).isRequired,
   categories: array,
   amenities: array,
+  level: array,
+  subject: array,
+  teachingHour: array,
   priceFilterConfig: shape({
     min: number.isRequired,
     max: number.isRequired,
@@ -381,7 +405,7 @@ SearchPage.loadData = (params, search) => {
     page,
     perPage: RESULT_PAGE_SIZE,
     include: ['author', 'images'],
-    'fields.listing': ['title', 'geolocation', 'price'],
+    'fields.listing': ['title', 'geolocation', 'price', 'publicData.isTeacher'],
     'fields.user': ['profile.displayName', 'profile.abbreviatedName'],
     'fields.image': ['variants.landscape-crop', 'variants.landscape-crop2x'],
     'limit.images': 1,

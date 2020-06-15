@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import { intlShape } from '../../util/reactIntl';
 import routeConfiguration from '../../routeConfiguration';
 import {
@@ -17,6 +18,7 @@ import {
   EditListingPhotosPanel,
   EditListingPoliciesPanel,
   EditListingPricingPanel,
+  EditListingGeneralPanel,
 } from '../../components';
 
 import css from './EditListingWizard.css';
@@ -28,6 +30,7 @@ export const POLICY = 'policy';
 export const LOCATION = 'location';
 export const PRICING = 'pricing';
 export const PHOTOS = 'photos';
+export const GENERAL = 'general';
 
 // EditListingWizardTab component supports these tabs
 export const SUPPORTED_TABS = [
@@ -38,6 +41,7 @@ export const SUPPORTED_TABS = [
   PRICING,
   AVAILABILITY,
   PHOTOS,
+  GENERAL,
 ];
 
 const pathParamsToNextTab = (params, tab, marketplaceTabs) => {
@@ -58,16 +62,18 @@ const redirectAfterDraftUpdate = (listingId, params, tab, marketplaceTabs, histo
   };
   const routes = routeConfiguration();
 
+  const page = _.includes(history.location.pathname, '/p/') ? 'EditProfilePage' : 'EditListingPage';
+
   // Replace current "new" path to "draft" path.
   // Browser's back button should lead to editing current draft instead of creating a new one.
   if (params.type === LISTING_PAGE_PARAM_TYPE_NEW) {
-    const draftURI = createResourceLocatorString('EditListingPage', routes, currentPathParams, {});
+    const draftURI = createResourceLocatorString(page, routes, currentPathParams, {});
     history.replace(draftURI);
   }
 
   // Redirect to next tab
   const nextPathParams = pathParamsToNextTab(currentPathParams, tab, marketplaceTabs);
-  const to = createResourceLocatorString('EditListingPage', routes, nextPathParams, {});
+  const to = createResourceLocatorString(page, routes, nextPathParams, {});
   history.push(to);
 };
 
@@ -157,6 +163,20 @@ const EditListingWizardTab = props => {
   };
 
   switch (tab) {
+    case GENERAL: {
+      const submitButtonTranslationKey = isNewListingFlow
+        ? 'EditListingWizard.saveNewGeneral'
+        : 'EditListingWizard.saveEditGeneral';
+      return (
+        <EditListingGeneralPanel
+          {...panelProps(GENERAL)}
+          submitButtonText={intl.formatMessage({ id: submitButtonTranslationKey })}
+          onSubmit={values => {
+            onCompleteEditListingWizardTab(tab, values);
+          }}
+        />
+      );
+    }
     case DESCRIPTION: {
       const submitButtonTranslationKey = isNewListingFlow
         ? 'EditListingWizard.saveNewDescription'
@@ -235,7 +255,11 @@ const EditListingWizardTab = props => {
         <EditListingAvailabilityPanel
           {...panelProps(AVAILABILITY)}
           availability={availability}
-          submitButtonText={intl.formatMessage({ id: submitButtonTranslationKey })}
+          submitButtonText={intl.formatMessage({
+            id: _.includes(history.location.pathname, '/p/')
+              ? 'EditListingWizard.publishListing'
+              : submitButtonTranslationKey,
+          })}
           onSubmit={values => {
             onCompleteEditListingWizardTab(tab, values);
           }}

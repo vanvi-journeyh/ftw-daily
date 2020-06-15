@@ -2,6 +2,7 @@ import React from 'react';
 import { bool, func, object, shape, string, oneOf } from 'prop-types';
 import { compose } from 'redux';
 import { withRouter } from 'react-router-dom';
+import _ from 'lodash';
 import { intlShape, injectIntl } from '../../util/reactIntl';
 import { connect } from 'react-redux';
 import { types as sdkTypes } from '../../util/sdkLoader';
@@ -120,7 +121,7 @@ export const EditListingPageComponent = props => {
           },
         }
       : {
-          name: 'ListingPage',
+          name: _.includes(history.location.pathname, '/p/') ? 'ListingTeacherPage' : 'ListingPage',
           params: {
             id: listingId.uuid,
             slug: listingSlug,
@@ -361,10 +362,7 @@ const mapDispatchToProps = dispatch => ({
 // See: https://github.com/ReactTraining/react-router/issues/4671
 const EditListingPage = compose(
   withRouter,
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
+  connect(mapStateToProps, mapDispatchToProps)
 )(injectIntl(EditListingPageComponent));
 
 EditListingPage.loadData = loadData;

@@ -23,6 +23,7 @@ import {
   StyleguidePage,
   TermsOfServicePage,
   TransactionPage,
+  ListingTeacherPage,
 } from './containers';
 
 // routeConfiguration needs to initialize containers first
@@ -99,6 +100,12 @@ const routeConfiguration = () => {
       loadData: ListingPage.loadData,
     },
     {
+      path: '/p/:slug/:id',
+      name: 'ListingTeacherPage',
+      component: props => <ListingTeacherPage {...props} />,
+      loadData: ListingPage.loadData,
+    },
+    {
       path: '/l/:slug/:id/checkout',
       name: 'CheckoutPage',
       auth: true,
@@ -125,8 +132,26 @@ const routeConfiguration = () => {
       ),
     },
     {
+      path: '/p/new',
+      name: 'NewProfilePage',
+      auth: true,
+      component: () => (
+        <NamedRedirect
+          name="EditProfilePage"
+          params={{ slug: draftSlug, id: draftId, type: 'new', tab: 'general' }}
+        />
+      ),
+    },
+    {
       path: '/l/:slug/:id/:type/:tab',
       name: 'EditListingPage',
+      auth: true,
+      component: props => <EditListingPage {...props} />,
+      loadData: EditListingPage.loadData,
+    },
+    {
+      path: '/p/:slug/:id/:type/:tab',
+      name: 'EditProfilePage',
       auth: true,
       component: props => <EditListingPage {...props} />,
       loadData: EditListingPage.loadData,

@@ -11,9 +11,9 @@ import {
 import {
   TRANSITION_ACCEPT,
   TRANSITION_COMPLETE,
-  TRANSITION_DECLINE,
+  TRANSITION_PROVIDER_DECLINE,
   TRANSITION_EXPIRE_REVIEW_PERIOD,
-  TRANSITION_REQUEST_PAYMENT,
+  TRANSITION_REQUEST,
   TRANSITION_CONFIRM_PAYMENT,
   TRANSITION_REVIEW_1_BY_CUSTOMER,
   TRANSITION_REVIEW_1_BY_PROVIDER,
@@ -85,7 +85,7 @@ export const WithTransitions = {
         createTxTransition({
           createdAt: new Date(Date.UTC(2017, 10, 9, 8, 10)),
           by: TX_TRANSITION_ACTOR_CUSTOMER,
-          transition: TRANSITION_REQUEST_PAYMENT,
+          transition: TRANSITION_REQUEST,
         }),
         createTxTransition({
           createdAt: new Date(Date.UTC(2017, 10, 9, 8, 10)),
@@ -127,7 +127,7 @@ export const WithMessagesTransitionsAndReviews = {
         createTxTransition({
           createdAt: new Date(Date.UTC(2017, 10, 9, 8, 10)),
           by: TX_TRANSITION_ACTOR_CUSTOMER,
-          transition: TRANSITION_REQUEST_PAYMENT,
+          transition: TRANSITION_REQUEST,
         }),
         createTxTransition({
           createdAt: new Date(Date.UTC(2017, 10, 9, 8, 10)),
@@ -142,7 +142,7 @@ export const WithMessagesTransitionsAndReviews = {
         createTxTransition({
           createdAt: new Date(Date.UTC(2017, 10, 9, 10, 33)),
           by: TX_TRANSITION_ACTOR_PROVIDER,
-          transition: TRANSITION_DECLINE,
+          transition: TRANSITION_PROVIDER_DECLINE,
         }),
         createTxTransition({
           createdAt: new Date(Date.UTC(2017, 10, 9, 10, 34)),
@@ -269,7 +269,7 @@ class PagedFeed extends Component {
     const trans1 = createTxTransition({
       createdAt: dates[0],
       by: TX_TRANSITION_ACTOR_CUSTOMER,
-      transition: TRANSITION_REQUEST_PAYMENT,
+      transition: TRANSITION_REQUEST,
     });
     const trans2 = createTxTransition({
       createdAt: dates[0],

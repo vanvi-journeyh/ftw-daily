@@ -69,7 +69,13 @@ class EditListingLocationPanel extends Component {
         values={{ listingTitle: <ListingLink listing={listing} /> }}
       />
     ) : (
-      <FormattedMessage id="EditListingLocationPanel.createListingTitle" />
+      <FormattedMessage
+        id={
+          listing.attributes.publicData.isTeacher
+            ? 'EditListingLocationPanel.createListingTeacherTitle'
+            : 'EditListingLocationPanel.createListingTitle'
+        }
+      />
     );
 
     return (

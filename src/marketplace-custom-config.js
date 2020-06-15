@@ -84,3 +84,21 @@ export const sortConfig = {
     { key: 'relevance', label: 'Relevance', longLabel: 'Relevance (Keyword search)' },
   ],
 };
+
+export const subject = [
+  { key: 'math', label: 'Math' },
+  { key: 'physic', label: 'Physic' },
+  { key: 'chemistry', label: 'Chemistry' },
+  { key: 'literature', label: 'Literature' },
+];
+
+export const level = [
+  { key: 'beginner', label: 'Beginner' },
+  { key: 'intermediate', label: 'Intermediate' },
+  { key: 'expert', label: 'Expert' },
+];
+
+export const teachingHour = [
+  { key: 'fulltime', label: 'Full Time' },
+  { key: 'parttime', label: 'Part Time' },
+];

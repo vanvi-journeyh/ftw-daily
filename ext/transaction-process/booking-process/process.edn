@@ -1,0 +1,332 @@
+{
+  :format :v3,
+  :transitions
+  [
+    {
+      :name :transition/enquire,
+      :actor :actor.role/customer,
+      :actions [],
+      :to :state/enquiry
+    }
+    {
+      :name :transition/request,
+      :actor :actor.role/customer,
+      :actions [
+        {
+          :name :action/create-booking,
+          :config {:oberve-availability? true}
+        }
+        {
+          :name :action/calculate-tx-unit-total-price
+        }
+        {
+          :name :action/calculate-tx-provider-commission,
+          :config {:commission 0.25M}
+        }
+        {
+          :name :action/calculate-tx-customer-commission,
+          :config {:commission 0.55M}
+        }
+        {
+          :name :action/stripe-create-payment-intent
+        }
+      ],
+      :to :state/pending-payment
+    }
+    {
+      :name :transition/request-first-time,
+      :actor :actor.role/customer,
+      :actions [
+        {
+          :name :action/create-booking,
+          :config {:oberve-availability? true}
+        }
+        {
+          :name :action/calculate-tx-unit-total-price
+        }
+        {
+          :name :action/calculate-tx-provider-commission,
+          :config {:commission 0.25M}
+        }
+        {
+          :name :action/calculate-tx-customer-commission,
+          :config {:commission 0.15M}
+        }
+        {
+          :name :action/stripe-create-payment-intent
+        }
+      ],
+      :to :state/pending-payment
+    }
+    {
+      :name :transition/request-after-enquiry,
+      :actor :actor.role/customer,
+      :actions [
+        {
+          :name :action/create-booking,
+          :config {:oberve-availability? true}
+        }
+        {
+          :name :action/calculate-tx-unit-total-price
+        }
+        {
+          :name :action/calculate-tx-provider-commission,
+          :config {:commission 0.25M}
+        }
+        {
+          :name :action/calculate-tx-customer-commission,
+          :config {:commission 0.55M}
+        }
+        {
+          :name :action/stripe-create-payment-intent
+        }
+      ],
+      :from :state/enquiry,
+      :to :state/pending-payment
+    }
+    {
+      :name :transition/request-after-enquiry-first-time,
+      :actor :actor.role/customer,
+      :actions [
+        {
+          :name :action/create-booking,
+          :config {:oberve-availability? true}
+        }
+        {
+          :name :action/calculate-tx-unit-total-price
+        }
+        {
+          :name :action/calculate-tx-provider-commission,
+          :config {:commission 0.25M}
+        }
+        {
+          :name :action/calculate-tx-customer-commission,
+          :config {:commission 0.15M}
+        }
+        {
+          :name :action/stripe-create-payment-intent
+        }
+      ],
+      :from :state/enquiry,
+      :to :state/pending-payment
+    }
+    {
+      :name :transition/confirm-payment,
+      :actor :actor.role/customer,
+      :actions [
+        {
+          :name :action/stripe-confirm-payment-intent
+        }
+      ],
+      :from :state/pending-payment,
+      :to :state/preauthorized
+    }
+    {
+      :name :transition/accept,
+      :actor :actor.role/provider,
+      :actions [
+        {
+          :name :action/accept-booking
+        }
+        {
+          :name :action/stripe-capture-payment-intent
+        }
+      ],
+      :from :state/preauthorized,
+      :to :state/accepted
+    }
+    {
+      :name :transition/provider-decline,
+      :actor :actor.role/provider,
+      :actions [
+        {:name :action/decline-booking}
+        {:name :action/calculate-full-refund}
+        {:name :action/stripe-refund-payment}
+      ],
+      :from :state/preauthorized,
+      :to :state/declined
+    }
+    {
+      :name :transition/customer-decline,
+      :actor :actor.role/customer,
+      :actions [
+        {:name :action/decline-booking}
+        {:name :action/calculate-full-refund}
+        {:name :action/stripe-refund-payment}
+      ],
+      :from :state/preauthorized,
+      :to :state/declined
+    }
+    {
+      :name :transition/expire,
+      :at {
+        :fn/plus [
+          {
+            :fn/timepoint [
+              :time/first-entered-state :state/preauthorized
+            ]
+          }
+          {:fn/period ["P7D"]}
+        ]
+      },
+      :actions [
+        {:name :action/decline-booking}
+        {:name :action/calculate-full-refund}
+        {:name :action/stripe-refund-payment}
+      ],
+      :from :state/preauthorized,
+      :to :state/declined
+    }
+    {
+      :name :transition/wait-no-refund,
+      :at {
+        :fn/min [
+          {
+            :fn/plus [
+              {
+                :fn/timepoint [
+                  :time/first-entered-state :state/preauthorized
+                ]
+              }
+              {:fn/period ["P2D"]}
+            ]
+          }
+          {
+            :fn/minus [
+              {
+                :fn/timepoint [
+                  :time/booking-start
+                ]
+              }
+              {:fn/period ["P1D"]}
+            ]
+          }
+        ]
+      },
+      :actions [],
+      :from :state/accepted,
+      :to :state/cancel-booking-no-refund,
+    }
+    {
+      :name :transition/provider-cancel,
+      :actor :actor.role/provider
+      :actions [
+        {:name :action/cancel-booking}
+        {:name :action/calculate-full-refund}
+        {:name :action/stripe-refund-payment}
+      ],
+      :from :state/accepted,
+      :to :state/cancelled
+    }
+    {
+      :name :transition/customer-cancel-refund,
+      :actor :actor.role/customer
+      :actions [
+        {:name :action/cancel-booking}
+        {:name :action/calculate-full-refund}
+        {:name :action/stripe-refund-payment}
+      ],
+      :from :state/accepted,
+      :to :state/cancelled
+    }
+    {
+      :name :transition/provider-cancel-after-48-hour,
+      :actor :actor.role/provider
+      :actions [
+        {:name :action/cancel-booking}
+        {:name :action/calculate-full-refund}
+        {:name :action/stripe-refund-payment}
+      ],
+      :from :state/cancel-booking-no-refund,
+      :to :state/cancelled
+    }
+    {
+      :name :transition/customer-cancel-no-refund,
+      :actor :actor.role/customer
+      :actions [
+        {:name :action/cancel-booking}
+        {:name :action/stripe-create-payout}
+      ],
+      :from :state/cancel-booking-no-refund,
+      :to :state/cancelled
+    }
+    {
+      :name :transition/complete,
+      :at {:fn/timepoint [:time/booking-end]},
+      :actions [
+        {:name :action/stripe-create-payout}
+      ]
+      :from :state/cancel-booking-no-refund,
+      :to :state/delivered
+    }
+    {
+      :name :transition/review-1-by-customer,
+      :actor :actor.role/customer,
+      :actions [{:name :action/post-review-by-customer}],
+      :from :state/delivered,
+      :to :state/reviewed-by-customer
+    }
+    {
+      :name :transition/review-2-by-provider,
+      :actor :actor.role/provider,
+      :actions [
+        {:name :action/post-review-by-provider}
+        {:name :action/publish-reviews}
+      ],
+      :from :state/reviewed-by-customer,
+      :to :state/reviewed
+    }
+    {
+      :name :transition/review-1-by-provider,
+      :actor :actor.role/provider,
+      :actions [{:name :action/post-review-by-provider}],
+      :from :state/delivered,
+      :to :state/reviewed-by-provider
+    }
+    {
+      :name :transition/review-2-by-customer,
+      :actor :actor.role/customer,
+      :actions [
+        {:name :action/post-review-by-customer}
+        {:name :action/publish-reviews}
+      ],
+      :from :state/reviewed-by-provider,
+      :to :state/reviewed
+    }
+    {
+      :name :transition/expire-review-period,
+      :at {
+        :fn/plus [
+          {:fn/timepoint [:time/booking-end]} {:fn/period ["P7D"]}
+        ]
+      }
+      :actions [],
+      :from :state/delivered,
+      :to :state/reviewed
+    }
+    {
+      :name :transition/expire-provider-review-period,
+      :at {
+        :fn/plus [
+          {:fn/timepoint [:time/booking-end]}
+          {:fn/period ["P7D"]}
+        ]
+      },
+      :actions [{:name :action/publish-reviews}],
+      :from :state/reviewed-by-customer,
+      :to :state/reviewed
+    }
+    {
+      :name :transition/expire-customer-review-period,
+      :at {
+        :fn/plus [
+          {:fn/timepoint [:time/booking-end]} 
+          {:fn/period ["P7D"]}
+        ]
+      },
+      :actions [{:name :action/publish-reviews}],
+      :from :state/reviewed-by-provider,
+      :to :state/reviewed
+    }
+  ]
+}

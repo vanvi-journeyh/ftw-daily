@@ -84,7 +84,7 @@ const createListingURL = (routes, listing) => {
           },
         }
       : {
-          name: 'ListingPage',
+          name: listing.attributes.publicData.isTeacher ? 'ListingTeacherPage' : 'ListingPage',
           params: { id, slug },
         };
 
@@ -164,6 +164,8 @@ export const ManageListingCardComponent = props => {
     : isDaily
     ? 'ManageListingCard.perDay'
     : 'ManageListingCard.perUnit';
+
+  const page = listing.attributes.publicData.isTeacher ? 'EditProfilePage' : 'EditListingPage';
 
   return (
     <div className={classes}>
@@ -247,8 +249,13 @@ export const ManageListingCardComponent = props => {
             >
               <NamedLink
                 className={css.finishListingDraftLink}
-                name="EditListingPage"
-                params={{ id, slug, type: LISTING_PAGE_PARAM_TYPE_DRAFT, tab: 'photos' }}
+                name={page}
+                params={{
+                  id,
+                  slug,
+                  type: LISTING_PAGE_PARAM_TYPE_DRAFT,
+                  tab: listing.attributes.publicData.isTeacher ? 'availability' : 'photos',
+                }}
               >
                 <FormattedMessage id="ManageListingCard.finishListingDraft" />
               </NamedLink>
@@ -330,8 +337,13 @@ export const ManageListingCardComponent = props => {
         <div className={css.manageLinks}>
           <NamedLink
             className={css.manageLink}
-            name="EditListingPage"
-            params={{ id, slug, type: editListingLinkType, tab: 'description' }}
+            name={page}
+            params={{
+              id,
+              slug,
+              type: editListingLinkType,
+              tab: listing.attributes.publicData.isTeacher ? 'general' : 'description',
+            }}
           >
             <FormattedMessage id="ManageListingCard.editListing" />
           </NamedLink>
@@ -342,7 +354,7 @@ export const ManageListingCardComponent = props => {
 
               <NamedLink
                 className={css.manageLink}
-                name="EditListingPage"
+                name={page}
                 params={{ id, slug, type: editListingLinkType, tab: 'availability' }}
               >
                 <FormattedMessage id="ManageListingCard.manageAvailability" />

@@ -13,6 +13,7 @@ import {
   txHasBeenDelivered,
   txIsPaymentExpired,
   txIsPaymentPending,
+  txIsWaitingNoRefund,
 } from '../../util/transaction';
 import { propTypes, DATE_TYPE_DATE } from '../../util/types';
 import { ensureCurrentUser } from '../../util/data';
@@ -117,7 +118,7 @@ export const txState = (intl, tx, type) => {
         id: 'InboxPage.stateDeclined',
       }),
     };
-  } else if (txIsAccepted(tx)) {
+  } else if (txIsAccepted(tx) || txIsWaitingNoRefund(tx)) {
     return {
       nameClassName: css.nameNotEmphasized,
       bookingClassName: css.bookingNoActionNeeded,

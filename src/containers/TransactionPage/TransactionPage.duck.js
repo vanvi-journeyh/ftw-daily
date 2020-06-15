@@ -11,7 +11,7 @@ import {
   getReview2Transition,
   txIsInFirstReviewBy,
   TRANSITION_ACCEPT,
-  TRANSITION_DECLINE,
+  TRANSITION_PROVIDER_DECLINE,
 } from '../../util/transaction';
 import * as log from '../../util/log';
 import {
@@ -353,7 +353,7 @@ export const declineSale = id => (dispatch, getState, sdk) => {
   dispatch(declineSaleRequest());
 
   return sdk.transactions
-    .transition({ id, transition: TRANSITION_DECLINE, params: {} }, { expand: true })
+    .transition({ id, transition: TRANSITION_PROVIDER_DECLINE, params: {} }, { expand: true })
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       dispatch(declineSaleSuccess());
@@ -364,7 +364,7 @@ export const declineSale = id => (dispatch, getState, sdk) => {
       dispatch(declineSaleError(storableError(e)));
       log.error(e, 'reject-sale-failed', {
         txId: id,
-        transition: TRANSITION_DECLINE,
+        transition: TRANSITION_PROVIDER_DECLINE,
       });
       throw e;
     });

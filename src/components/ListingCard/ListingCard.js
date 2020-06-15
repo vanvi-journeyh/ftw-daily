@@ -66,7 +66,15 @@ export const ListingCardComponent = props => {
     : 'ListingCard.perUnit';
 
   return (
-    <NamedLink className={classes} name="ListingPage" params={{ id, slug }}>
+    <NamedLink
+      className={classes}
+      name={
+        listing.attributes.publicData && listing.attributes.publicData.isTeacher
+          ? 'ListingTeacherPage'
+          : 'ListingPage'
+      }
+      params={{ id, slug }}
+    >
       <div
         className={css.threeToTwoWrapper}
         onMouseEnter={() => setActiveListing(currentListing.id)}

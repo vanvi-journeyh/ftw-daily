@@ -3,8 +3,8 @@ import config from '../../config';
 import { denormalisedResponseEntities } from '../../util/data';
 import { storableError } from '../../util/errors';
 import {
-  TRANSITION_REQUEST_PAYMENT,
-  TRANSITION_REQUEST_PAYMENT_AFTER_ENQUIRY,
+  TRANSITION_REQUEST,
+  TRANSITION_REQUEST_AFTER_ENQUIRY,
   TRANSITION_CONFIRM_PAYMENT,
 } from '../../util/transaction';
 import * as log from '../../util/log';
@@ -164,12 +164,12 @@ export const initiateOrder = (orderParams, transactionId) => (dispatch, getState
   const bodyParams = transactionId
     ? {
         id: transactionId,
-        transition: TRANSITION_REQUEST_PAYMENT_AFTER_ENQUIRY,
+        transition: TRANSITION_REQUEST_AFTER_ENQUIRY,
         params: orderParams,
       }
     : {
         processAlias: config.bookingProcessAlias,
-        transition: TRANSITION_REQUEST_PAYMENT,
+        transition: TRANSITION_REQUEST,
         params: orderParams,
       };
   const queryParams = {
@@ -262,7 +262,7 @@ export const sendMessage = params => (dispatch, getState, sdk) => {
 export const speculateTransaction = params => (dispatch, getState, sdk) => {
   dispatch(speculateTransactionRequest());
   const bodyParams = {
-    transition: TRANSITION_REQUEST_PAYMENT,
+    transition: TRANSITION_REQUEST,
     processAlias: config.bookingProcessAlias,
     params: {
       ...params,

@@ -154,11 +154,23 @@ class SearchFiltersPanelComponent extends Component {
   }
 
   render() {
-    const { rootClassName, className, intl, categoryFilter, amenitiesFilter } = this.props;
+    const {
+      rootClassName,
+      className,
+      intl,
+      categoryFilter,
+      amenitiesFilter,
+      levelFilter,
+      subjectFilter,
+      teachingHourFilter,
+    } = this.props;
     const classes = classNames(rootClassName || css.root, className);
 
     const initialCategory = this.initialValue(categoryFilter.paramName);
     const initialAmenities = this.initialValues(amenitiesFilter.paramName);
+    const initialLevel = this.initialValues(levelFilter.paramName);
+    const initialSubject = this.initialValues(subjectFilter.paramName);
+    const initialTeachingHour = this.initialValue(teachingHourFilter.paramName);
 
     const categoryLabel = intl.formatMessage({
       id: 'SearchFiltersPanel.categoryLabel',
@@ -194,11 +206,60 @@ class SearchFiltersPanelComponent extends Component {
       />
     ) : null;
 
+    const subjectFilterElement = subjectFilter ? (
+      <SelectMultipleFilter
+        id={'SearchFiltersPanel.subjectFilter'}
+        name="subject"
+        urlParam={subjectFilter.paramName}
+        label={intl.formatMessage({
+          id: 'SearchFiltersPanel.subjectLabel',
+        })}
+        onSubmit={this.handleSelectMultiple}
+        liveEdit
+        options={subjectFilter.options}
+        initialValues={initialSubject}
+        contentPlacementOffset={FILTER_DROPDOWN_OFFSET}
+      />
+    ) : null;
+
+    const levelFilterElement = levelFilter ? (
+      <SelectMultipleFilter
+      id={'SearchFiltersPanel.levelFilter'}
+        name="level"
+        urlParam={levelFilter.paramName}
+        label={intl.formatMessage({
+          id: 'SearchFiltersPanel.levelLabel',
+        })}
+        onSubmit={this.handleSelectMultiple}
+        liveEdit
+        options={levelFilter.options}
+        initialValues={initialLevel}
+        contentPlacementOffset={FILTER_DROPDOWN_OFFSET}
+      />
+    ) : null;
+
+    const teachingHourFilterElement = teachingHourFilter ? (
+      <SelectSingleFilter
+        urlParam={teachingHourFilter.paramName}
+        label={intl.formatMessage({
+          id: 'SearchFiltersPanel.teachingHourLabel',
+        })}
+        onSelect={this.handleSelectSingle}
+        liveEdit
+        options={teachingHourFilter.options}
+        initialValue={initialTeachingHour}
+        contentPlacementOffset={FILTER_DROPDOWN_OFFSET}
+      />
+    ) : null;
+
     return (
       <div className={classes}>
         <div className={css.filtersWrapper}>
           {categoryFilterElement}
           {amenitiesFilterElement}
+          {subjectFilterElement}
+          {levelFilterElement}
+          {teachingHourFilterElement}
         </div>
         <div className={css.footer}>
           <InlineTextButton rootClassName={css.resetAllButton} onClick={this.resetAll}>

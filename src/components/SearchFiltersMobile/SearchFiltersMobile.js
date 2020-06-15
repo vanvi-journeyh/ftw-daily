@@ -212,6 +212,9 @@ class SearchFiltersMobileComponent extends Component {
       dateRangeFilter,
       keywordFilter,
       intl,
+      levelFilter,
+      subjectFilter,
+      teachingHourFilter,
     } = this.props;
 
     const classes = classNames(rootClassName || css.root, className);
@@ -324,6 +327,53 @@ class SearchFiltersMobileComponent extends Component {
       />
     ) : null;
 
+    const initialLevel = this.initialValues(levelFilter.paramName);
+    const initialSubject = this.initialValues(subjectFilter.paramName);
+    const initialTeachingHour = this.initialValue(teachingHourFilter.paramName);
+
+    const subjectFilterElement = subjectFilter ? (
+      <SelectMultipleFilter
+        id={'SearchFiltersPanel.subjectFilter'}
+        name="subject"
+        urlParam={subjectFilter.paramName}
+        label={intl.formatMessage({
+          id: 'SearchFiltersPanel.subjectLabel',
+        })}
+        onSubmit={this.handleSelectMultiple}
+        liveEdit
+        options={subjectFilter.options}
+        initialValues={initialSubject}
+      />
+    ) : null;
+
+    const levelFilterElement = levelFilter ? (
+      <SelectMultipleFilter
+        id={'SearchFiltersPanel.levelFilter'}
+        name="level"
+        urlParam={levelFilter.paramName}
+        label={intl.formatMessage({
+          id: 'SearchFiltersPanel.levelLabel',
+        })}
+        onSubmit={this.handleSelectMultiple}
+        liveEdit
+        options={levelFilter.options}
+        initialValues={initialLevel}
+      />
+    ) : null;
+
+    const teachingHourFilterElement = teachingHourFilter ? (
+      <SelectSingleFilter
+        urlParam={teachingHourFilter.paramName}
+        label={intl.formatMessage({
+          id: 'SearchFiltersPanel.teachingHourLabel',
+        })}
+        onSelect={this.handleSelectSingle}
+        liveEdit
+        options={teachingHourFilter.options}
+        initialValue={initialTeachingHour}
+      />
+    ) : null;
+
     return (
       <div className={classes}>
         <div className={css.searchResultSummary}>
@@ -362,6 +412,9 @@ class SearchFiltersMobileComponent extends Component {
               {amenitiesFilterElement}
               {priceFilterElement}
               {dateRangeFilterElement}
+              {subjectFilterElement}
+              {levelFilterElement}
+              {teachingHourFilterElement}
             </div>
           ) : null}
 

@@ -3,7 +3,7 @@ import { array, arrayOf, bool, func, number, string } from 'prop-types';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import classNames from 'classnames';
 import {
-  TRANSITION_REQUEST_PAYMENT_AFTER_ENQUIRY,
+  TRANSITION_REQUEST_AFTER_ENQUIRY,
   txIsAccepted,
   txIsCanceled,
   txIsDeclined,
@@ -217,7 +217,7 @@ export class TransactionPanelComponent extends Component {
             })
           : [];
         const hasCorrectNextTransition =
-          transitions.length > 0 && transitions.includes(TRANSITION_REQUEST_PAYMENT_AFTER_ENQUIRY);
+          transitions.length > 0 && transitions.includes(TRANSITION_REQUEST_AFTER_ENQUIRY);
         return {
           headingState: HEADING_ENQUIRED,
           showBookingPanel: isCustomer && !isProviderBanned && hasCorrectNextTransition,

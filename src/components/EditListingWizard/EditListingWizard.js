@@ -1,6 +1,7 @@
 import React, { Component, useEffect } from 'react';
 import { array, bool, func, number, object, oneOf, shape, string } from 'prop-types';
 import { compose } from 'redux';
+import _ from 'lodash';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import classNames from 'classnames';
 import config from '../../config';
@@ -26,6 +27,7 @@ import EditListingWizardTab, {
   LOCATION,
   PRICING,
   PHOTOS,
+  GENERAL,
 } from './EditListingWizardTab';
 import css from './EditListingWizard.css';
 
@@ -36,15 +38,10 @@ const availabilityMaybe = config.enableAvailability ? [AVAILABILITY] : [];
 // Note 1: You need to change save button translations for new listing flow
 // Note 2: Ensure that draft listing is created after the first panel
 // and listing publishing happens after last panel.
-export const TABS = [
-  DESCRIPTION,
-  FEATURES,
-  POLICY,
-  LOCATION,
-  PRICING,
-  ...availabilityMaybe,
-  PHOTOS,
-];
+const TABS_SAUNA = [DESCRIPTION, FEATURES, POLICY, LOCATION, PRICING, ...availabilityMaybe, PHOTOS];
+export let TABS = TABS_SAUNA;
+
+const TABS_TEACHER_PROFILE = [GENERAL, LOCATION, PRICING, ...availabilityMaybe];
 
 // Tabs are horizontal in small screens
 const MAX_HORIZONTAL_NAV_SCREEN_WIDTH = 1023;
@@ -68,6 +65,8 @@ const tabLabel = (intl, tab) => {
     key = 'EditListingWizard.tabLabelAvailability';
   } else if (tab === PHOTOS) {
     key = 'EditListingWizard.tabLabelPhotos';
+  } else if (tab === GENERAL) {
+    key = 'EditListingWizard.tabLabelGeneral';
   }
 
   return intl.formatMessage({ id: key });
@@ -93,6 +92,14 @@ const tabCompleted = (tab, listing) => {
   const images = listing.images;
 
   switch (tab) {
+    case GENERAL:
+      return !!(
+        description &&
+        title &&
+        publicData.subject &&
+        publicData.level &&
+        publicData.teachingHour
+      );
     case DESCRIPTION:
       return !!(description && title);
     case FEATURES:
@@ -279,6 +286,11 @@ class EditListingWizard extends Component {
     } = this.props;
 
     const selectedTab = params.tab;
+    if (_.includes(rest.history.location.pathname, '/p/')) {
+      TABS = TABS_TEACHER_PROFILE;
+    } else {
+      TABS = TABS_SAUNA;
+    }
     const isNewListingFlow = [LISTING_PAGE_PARAM_TYPE_NEW, LISTING_PAGE_PARAM_TYPE_DRAFT].includes(
       params.type
     );
@@ -294,7 +306,16 @@ class EditListingWizard extends Component {
         .reverse()
         .find(t => tabsStatus[t]);
 
-      return <NamedRedirect name="EditListingPage" params={{ ...params, tab: nearestActiveTab }} />;
+      return (
+        <NamedRedirect
+          name={
+            _.includes(rest.history.location.pathname, '/p/')
+              ? 'EditProfilePage'
+              : 'EditListingPage'
+          }
+          params={{ ...params, tab: nearestActiveTab }}
+        />
+      );
     }
 
     const { width } = viewport;
@@ -314,7 +335,12 @@ class EditListingWizard extends Component {
     }
 
     const tabLink = tab => {
-      return { name: 'EditListingPage', params: { ...params, tab } };
+      return {
+        name: _.includes(rest.history.location.pathname, '/p/')
+          ? 'EditProfilePage'
+          : 'EditListingPage',
+        params: { ...params, tab },
+      };
     };
 
     const formDisabled = getAccountLinkInProgress;
@@ -490,7 +516,7 @@ EditListingWizard.propTypes = {
     id: string.isRequired,
     slug: string.isRequired,
     type: oneOf(LISTING_PAGE_PARAM_TYPES).isRequired,
-    tab: oneOf(TABS).isRequired,
+    tab: oneOf([...TABS_SAUNA, ...TABS_TEACHER_PROFILE]).isRequired,
   }).isRequired,
   stripeAccount: object,
   stripeAccountFetched: bool,

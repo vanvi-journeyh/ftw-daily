@@ -4,9 +4,9 @@ import {
   TRANSITION_ACCEPT,
   TRANSITION_CANCEL,
   TRANSITION_COMPLETE,
-  TRANSITION_DECLINE,
+  TRANSITION_PROVIDER_DECLINE,
   TRANSITION_EXPIRE,
-  TRANSITION_REQUEST_PAYMENT,
+  TRANSITION_REQUEST,
   TRANSITION_CONFIRM_PAYMENT,
   TX_TRANSITION_ACTOR_CUSTOMER,
 } from '../../util/transaction';
@@ -46,7 +46,7 @@ const exampleTransaction = params => {
         {
           createdAt: created,
           by: TX_TRANSITION_ACTOR_CUSTOMER,
-          transition: TRANSITION_REQUEST_PAYMENT,
+          transition: TRANSITION_REQUEST,
         },
         {
           createdAt: confirmed,
@@ -294,7 +294,7 @@ export const ProviderSaleDeclined = {
     unitType: LINE_ITEM_NIGHT,
     dateType: DATE_TYPE_DATETIME,
     transaction: exampleTransaction({
-      lastTransition: TRANSITION_DECLINE,
+      lastTransition: TRANSITION_PROVIDER_DECLINE,
       payinTotal: new Money(4500, CURRENCY),
       payoutTotal: new Money(2500, CURRENCY),
       lineItems: [

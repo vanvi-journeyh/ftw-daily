@@ -195,6 +195,7 @@ export class CheckoutPageComponent extends Component {
         listingId,
         bookingStart: bookingStartForAPI,
         bookingEnd: bookingEndForAPI,
+        quantity: bookingEndForAPI.getDate() - bookingStartForAPI.getDate(),
       });
     }
 
@@ -374,6 +375,7 @@ export class CheckoutPageComponent extends Component {
       listingId: pageData.listing.id,
       bookingStart: tx.booking.attributes.start,
       bookingEnd: tx.booking.attributes.end,
+      quantity: tx.booking.attributes.end.getDate() - tx.booking.attributes.start.getDate(),
       ...optionalPaymentParams,
     };
 
