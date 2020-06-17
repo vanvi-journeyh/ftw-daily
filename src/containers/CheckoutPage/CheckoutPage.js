@@ -55,6 +55,7 @@ import {
 } from './CheckoutPage.duck';
 import { storeData, storedData, clearData } from './CheckoutPageSessionHelpers';
 import css from './CheckoutPage.css';
+import moment from 'moment';
 
 const STORAGE_KEY = 'CheckoutPage';
 
@@ -195,7 +196,7 @@ export class CheckoutPageComponent extends Component {
         listingId,
         bookingStart: bookingStartForAPI,
         bookingEnd: bookingEndForAPI,
-        quantity: bookingEndForAPI.getDate() - bookingStartForAPI.getDate(),
+        quantity: moment(bookingEndForAPI).diff(moment(bookingStartForAPI), 'days'),
       });
     }
 
@@ -375,7 +376,7 @@ export class CheckoutPageComponent extends Component {
       listingId: pageData.listing.id,
       bookingStart: tx.booking.attributes.start,
       bookingEnd: tx.booking.attributes.end,
-      quantity: tx.booking.attributes.end.getDate() - tx.booking.attributes.start.getDate(),
+      quantity: moment(tx.booking.attributes.end).diff(moment(tx.booking.attributes.start), 'days'),
       ...optionalPaymentParams,
     };
 

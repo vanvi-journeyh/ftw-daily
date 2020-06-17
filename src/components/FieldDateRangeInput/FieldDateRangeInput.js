@@ -14,6 +14,7 @@ import { propTypes } from '../../util/types';
 import { ValidationError } from '../../components';
 
 import DateRangeInput from './DateRangeInput';
+import DateTimeRangeInput from './DateTimeRangeInput';
 import css from './FieldDateRangeInput.css';
 
 const MAX_MOBILE_SCREEN_WIDTH = 768;
@@ -135,7 +136,7 @@ class FieldDateRangeInputComponent extends Component {
 
     return (
       <div className={classes}>
-        {label}
+        {/* {label}
         <DateRangeInput {...inputProps} />
         <div
           className={classNames(css.inputBorders, {
@@ -144,7 +145,9 @@ class FieldDateRangeInputComponent extends Component {
         >
           <div className={startDateBorderClasses} />
           <div className={endDateBorderClasses} />
-        </div>
+        </div> */}
+
+        <DateTimeRangeInput {...inputProps} startDateLabel={startDateLabel} endDateLabel={endDateLabel} />
         <ValidationError className={errorClasses} fieldMeta={meta} />
       </div>
     );
